@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examen de Simulación UNAM</title>
+    <title>Examen de Simulación UNAM - 3 Horas</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,148 +11,114 @@
             color: #333;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Evita el scroll en toda la página */
+            overflow: hidden;
         }
-        
-        /* Contenedor principal para dividir la pantalla */
-        .main-wrapper {
+
+        /* --- PANTALLA DE INICIO --- */
+        #welcome-screen {
             display: flex;
-            height: 100vh; /* Ocupa toda la altura de la ventana */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1a5276;
+            color: white;
+            position: absolute;
+            width: 100%;
+            z-index: 100;
+        }
+        .login-box {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            width: 350px;
+            text-align: center;
+        }
+        .login-box h2 { color: #1a5276; margin-bottom: 25px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+        .input-group input { 
+            width: 100%; padding: 12px; border: 1px solid #ccc; 
+            border-radius: 5px; box-sizing: border-box; 
+        }
+        .btn-start {
+            background-color: #27ae60; color: white; border: none;
+            padding: 15px 20px; width: 100%; border-radius: 5px;
+            font-size: 18px; cursor: pointer; transition: 0.3s;
+        }
+        .btn-start:hover { background-color: #219150; }
+
+        /* --- PANTALLA DE EXAMEN --- */
+        #main-exam-container {
+            display: none; /* Oculto hasta que inicien */
+            flex-direction: row;
+            height: 100vh;
             width: 100vw;
         }
 
-        /* Panel izquierdo para el PDF */
+        /* Temporizador Flotante */
+        #timer-bar {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            background: rgba(192, 57, 43, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
         .pdf-panel {
-            flex: 1.2; /* Toma un poco más de la mitad del espacio */
-            background-color: #525659; /* Color típico de fondo de lectores PDF */
+            flex: 1.2;
+            background-color: #525659;
             padding: 10px;
             box-sizing: border-box;
         }
-
         .pdf-panel iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 100%; height: 100%; border: none; border-radius: 8px;
             background-color: white;
         }
 
-        /* Panel derecho para el formulario */
         .exam-panel {
-            flex: 0.8; /* Toma el resto del espacio */
+            flex: 0.8;
             background: #fff;
             padding: 30px;
             box-sizing: border-box;
-            overflow-y: auto; /* Permite hacer scroll solo en esta sección */
-            box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+            overflow-y: auto;
         }
 
-        h1, h2 {
-            text-align: center;
-            color: #1a5276;
-            margin-top: 0;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
         .subject-title {
-            background-color: #1a5276;
-            color: white;
-            padding: 10px;
-            margin-top: 30px;
-            border-radius: 5px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            background-color: #1a5276; color: white;
+            padding: 10px; margin-top: 30px; border-radius: 5px;
+            position: sticky; top: 0; z-index: 10;
         }
         .question-block {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .question-number {
-            font-weight: bold;
-            margin-right: 15px;
-            display: inline-block;
-            width: 40px;
-        }
-        .options {
-            display: inline-block;
+            margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #eee;
         }
         .options label {
-            display: inline-block;
-            font-weight: normal;
-            margin-right: 15px;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 4px;
+            margin-right: 15px; cursor: pointer; padding: 5px; border-radius: 4px;
         }
-        .options label:hover {
-            background-color: #f0f8ff;
-        }
+        .options label:hover { background-color: #f0f8ff; }
+
         .btn-submit {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 30px;
-            margin-bottom: 30px;
-            transition: background 0.3s;
-        }
-        .btn-submit:hover {
-            background-color: #219150;
-        }
-        #results {
-            display: none;
-            margin-top: 30px;
-            margin-bottom: 50px;
-            padding: 20px;
-            background-color: #e8f8f5;
-            border-radius: 8px;
-            border: 2px solid #1abc9c;
-        }
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px dashed #ccc;
-        }
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        .total-score {
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            color: #c0392b;
-            margin-bottom: 20px;
+            display: block; width: 100%; padding: 15px; background-color: #27ae60;
+            color: white; border: none; border-radius: 5px; font-size: 18px;
+            cursor: pointer; margin: 30px 0 50px 0;
         }
 
-        /* Diseño responsivo para pantallas pequeñas (celulares) */
+        #results {
+            display: none; padding: 20px; background-color: #e8f8f5;
+            border-radius: 8px; border: 2px solid #1abc9c; margin-bottom: 50px;
+        }
+        .total-score { font-size: 26px; font-weight: bold; text-align: center; color: #c0392b; }
+        .result-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #ccc; }
+
         @media (max-width: 768px) {
-            .main-wrapper {
-                flex-direction: column;
-                overflow: auto;
-            }
+            #main-exam-container { flex-direction: column; overflow: auto; }
             body { overflow: auto; }
             .pdf-panel { height: 50vh; flex: none; }
             .exam-panel { overflow-y: visible; flex: none; }
@@ -161,47 +127,50 @@
 </head>
 <body>
 
-<div class="main-wrapper">
+<div id="welcome-screen">
+    <div class="login-box">
+        <h2>Simulación UNAM</h2>
+        <div class="input-group">
+            <label>Nombre Completo:</label>
+            <input type="text" id="studentName" placeholder="Ej. Juan Pérez">
+        </div>
+        <div class="input-group">
+            <label>Número de Cuenta:</label>
+            <input type="number" id="studentAccount" placeholder="000000000">
+        </div>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">
+            Al comenzar, tendrás 180 minutos (3 horas) para completar las 120 preguntas.
+        </p>
+        <button class="btn-start" onclick="startExam()">Comenzar Examen</button>
+    </div>
+</div>
+
+<div id="main-exam-container">
+    <div id="timer-bar">Tiempo: 03:00:00</div>
+
     <div class="pdf-panel">
-        <iframe src="area4.pdf" title="Examen PDF">
-            Tu navegador no soporta iframes. Por favor, abre el PDF manualmente.
-        </iframe>
+        <iframe src="area4.pdf"></iframe>
     </div>
 
     <div class="exam-panel">
-        <h1>Hoja de Respuestas</h1>
-        
-        <div id="student-info">
-            <div class="form-group">
-                <label for="studentName">Nombre del Alumno:</label>
-                <input type="text" id="studentName" placeholder="Ingresa tu nombre completo" required>
-            </div>
-            <div class="form-group">
-                <label for="studentAccount">Número de Cuenta:</label>
-                <input type="number" id="studentAccount" placeholder="Ingresa tu número de cuenta" required>
-            </div>
-        </div>
-
-        <div id="quiz-container">
-            </div>
-
-        <button id="submitBtn" class="btn-submit" onclick="gradeExam()">Calificar Examen</button>
+        <h2 id="displayStudent"></h2>
+        <div id="quiz-container"></div>
+        <button id="submitBtn" class="btn-submit" onclick="gradeExam()">Finalizar y Calificar</button>
 
         <div id="results">
-            <h2>Resultados del Examen</h2>
-            <p><strong>Alumno:</strong> <span id="resName"></span></p>
-            <p><strong>No. de Cuenta:</strong> <span id="resAccount"></span></p>
-            <div class="total-score">
-                Calificación Total: <span id="resTotal"></span> / 120
-            </div>
-            <h3>Desglose por Materia</h3>
+            <h2>Resultado Final</h2>
+            <div class="total-score" id="resTotal">0 / 120</div>
+            <hr>
             <div id="resSubjects"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // Clave de respuestas 
+    const TOTAL_MINUTES = 180;
+    let secondsRemaining = TOTAL_MINUTES * 60;
+    let timerInterval;
+
     const examData = [
         { q: 1, subject: 'Física', ans: 'C' }, { q: 2, subject: 'Física', ans: 'D' }, { q: 3, subject: 'Física', ans: 'A' }, { q: 4, subject: 'Física', ans: 'B' }, { q: 5, subject: 'Física', ans: 'D' }, { q: 6, subject: 'Física', ans: 'D' }, { q: 7, subject: 'Física', ans: 'B' }, { q: 8, subject: 'Física', ans: 'B' }, { q: 9, subject: 'Física', ans: 'A' }, { q: 10, subject: 'Física', ans: 'A' },
         { q: 11, subject: 'Literatura', ans: 'A' }, { q: 12, subject: 'Literatura', ans: 'C' }, { q: 13, subject: 'Literatura', ans: 'D' }, { q: 14, subject: 'Literatura', ans: 'C' }, { q: 15, subject: 'Literatura', ans: 'D' }, { q: 16, subject: 'Literatura', ans: 'A' }, { q: 17, subject: 'Literatura', ans: 'A' }, { q: 18, subject: 'Literatura', ans: 'A' }, { q: 19, subject: 'Literatura', ans: 'A' }, { q: 20, subject: 'Literatura', ans: 'A' },
@@ -215,7 +184,42 @@
         { q: 111, subject: 'Filosofía', ans: 'D' }, { q: 112, subject: 'Filosofía', ans: 'C' }, { q: 113, subject: 'Filosofía', ans: 'B' }, { q: 114, subject: 'Filosofía', ans: 'A' }, { q: 115, subject: 'Filosofía', ans: 'D' }, { q: 116, subject: 'Filosofía', ans: 'C' }, { q: 117, subject: 'Filosofía', ans: 'C' }, { q: 118, subject: 'Filosofía', ans: 'C' }, { q: 119, subject: 'Filosofía', ans: 'B' }, { q: 120, subject: 'Filosofía', ans: 'C' }
     ];
 
-    // Renderizar las preguntas
+    function startExam() {
+        const name = document.getElementById('studentName').value;
+        const account = document.getElementById('studentAccount').value;
+
+        if (!name || !account) {
+            alert("Por favor rellena tus datos.");
+            return;
+        }
+
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('main-exam-container').style.display = 'flex';
+        document.getElementById('displayStudent').textContent = `Alumno: ${name} (${account})`;
+
+        renderQuiz();
+        startTimer();
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            secondsRemaining--;
+            
+            let h = Math.floor(secondsRemaining / 3600);
+            let m = Math.floor((secondsRemaining % 3600) / 60);
+            let s = secondsRemaining % 60;
+
+            document.getElementById('timer-bar').textContent = 
+                `Tiempo: ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+            if (secondsRemaining <= 0) {
+                clearInterval(timerInterval);
+                alert("¡El tiempo se ha agotado!");
+                gradeExam();
+            }
+        }, 1000);
+    }
+
     function renderQuiz() {
         const container = document.getElementById('quiz-container');
         let currentSubject = '';
@@ -223,95 +227,52 @@
         examData.forEach(item => {
             if (item.subject !== currentSubject) {
                 currentSubject = item.subject;
-                const subjectHeader = document.createElement('h3');
-                subjectHeader.className = 'subject-title';
-                subjectHeader.textContent = currentSubject;
-                container.appendChild(subjectHeader);
+                const h3 = document.createElement('h3');
+                h3.className = 'subject-title';
+                h3.textContent = currentSubject;
+                container.appendChild(h3);
             }
 
-            const questionBlock = document.createElement('div');
-            questionBlock.className = 'question-block';
-
-            const numberLabel = document.createElement('span');
-            numberLabel.className = 'question-number';
-            numberLabel.textContent = `${item.q}.-`;
-
-            const optionsDiv = document.createElement('div');
-            optionsDiv.className = 'options';
-            const options = ['A', 'B', 'C', 'D'];
-            
-            options.forEach(opt => {
-                const label = document.createElement('label');
-                const radio = document.createElement('input');
-                radio.type = 'radio';
-                radio.name = `q${item.q}`;
-                radio.value = opt;
-                
-                label.appendChild(radio);
-                label.appendChild(document.createTextNode(` ${opt}`));
-                optionsDiv.appendChild(label);
-            });
-
-            questionBlock.appendChild(numberLabel);
-            questionBlock.appendChild(optionsDiv);
-            container.appendChild(questionBlock);
+            const div = document.createElement('div');
+            div.className = 'question-block';
+            div.innerHTML = `<span style="font-weight:bold; width:35px; display:inline-block;">${item.q}.</span>
+                <div class="options" style="display:inline-block">
+                    ${['A','B','C','D'].map(opt => `
+                        <label><input type="radio" name="q${item.q}" value="${opt}"> ${opt}</label>
+                    `).join('')}
+                </div>`;
+            container.appendChild(div);
         });
     }
 
-    // Calcular la calificación
     function gradeExam() {
-        const name = document.getElementById('studentName').value.trim();
-        const account = document.getElementById('studentAccount').value.trim();
-
-        if (!name || !account) {
-            alert('Por favor, ingresa tu nombre y número de cuenta antes de calificar.');
-            return;
-        }
-
+        clearInterval(timerInterval);
         let totalCorrect = 0;
         const subjectScores = {};
 
         examData.forEach(item => {
-            if (!subjectScores[item.subject]) {
-                subjectScores[item.subject] = { correct: 0, total: 0 };
-            }
-            subjectScores[item.subject].total++;
-        });
+            if(!subjectScores[item.subject]) subjectScores[item.subject] = {c:0, t:0};
+            subjectScores[item.subject].t++;
 
-        examData.forEach(item => {
-            const selectedOption = document.querySelector(`input[name="q${item.q}"]:checked`);
-            if (selectedOption && selectedOption.value === item.ans) {
+            const sel = document.querySelector(`input[name="q${item.q}"]:checked`);
+            if (sel && sel.value === item.ans) {
                 totalCorrect++;
-                subjectScores[item.subject].correct++;
+                subjectScores[item.subject].c++;
             }
         });
 
-        document.getElementById('resName').textContent = name;
-        document.getElementById('resAccount').textContent = account;
-        document.getElementById('resTotal').textContent = totalCorrect;
-
-        const resSubjectsContainer = document.getElementById('resSubjects');
-        resSubjectsContainer.innerHTML = ''; 
-
-        for (const [subject, score] of Object.entries(subjectScores)) {
-            const div = document.createElement('div');
-            div.className = 'result-item';
-            div.innerHTML = `<span><strong>${subject}</strong></span> <span>${score.correct} / ${score.total}</span>`;
-            resSubjectsContainer.appendChild(div);
+        document.getElementById('resTotal').textContent = `${totalCorrect} / 120`;
+        const resDiv = document.getElementById('resSubjects');
+        resDiv.innerHTML = '';
+        for (const s in subjectScores) {
+            resDiv.innerHTML += `<div class="result-item"><span>${s}</span><span>${subjectScores[s].c} / ${subjectScores[s].t}</span></div>`;
         }
 
+        document.getElementById('results').style.display = 'block';
         document.getElementById('submitBtn').style.display = 'none';
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.style.display = 'block';
-        
-        const allRadios = document.querySelectorAll('input[type="radio"]');
-        allRadios.forEach(r => r.disabled = true);
-        
-        // Scroll hacia los resultados dentro del panel
-        resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+        document.getElementById('results').scrollIntoView({behavior: 'smooth'});
     }
-
-    window.onload = renderQuiz;
 </script>
 
 </body>
